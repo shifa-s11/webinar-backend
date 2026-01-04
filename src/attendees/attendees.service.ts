@@ -58,18 +58,19 @@ export class AttendeesService {
     if (!Types.ObjectId.isValid(webinarId)) {
       throw new NotFoundException('Invalid webinar ID');
     }
-    const webinarObjectId = new Types.ObjectId(webinarId);
+    // const webinarObjectId = new Types.ObjectId(webinarId);
     const webinarExists = await this.webinarModel.exists({ _id: webinarId });
+    const webinar = await this.webinarModel.findById(webinarId);
     if (!webinarExists) {
       throw new NotFoundException('Webinar not found');
     }
-    return this.attendeeModel
-      .find(
-        { webinarId: webinarObjectId },
-        { fullName: 1, email: 1, createdAt: 1 },
-      )
-
+    const attendees = await this.attendeeModel
+      .find({ webinarId: webinar._id }, { fullName: 1, email: 1, createdAt: 1 })
       .sort({ createdAt: 1 })
       .lean();
+    return {
+      attendeeCount: webinar.attendeeCount,
+      attendees,
+    };
   }
 }

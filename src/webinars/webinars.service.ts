@@ -26,30 +26,34 @@ export class WebinarsService {
       .sort({ scheduledAt: 1 })
       .lean();
   }
-  async findByIdWithAttendees(webinarId: string) {
-    if (!Types.ObjectId.isValid(webinarId)) {
-      throw new Error('Invalid webinar ID');
-    }
-
-    const result = await this.webinarModel.aggregate([
-      {
-        $match: { _id: new Types.ObjectId(webinarId) },
-      },
-      {
-        $lookup: {
-          from: 'attendees',
-          localField: '_id',
-          foreignField: 'webinarId',
-          as: 'attendees',
-        },
-      },
-      {
-        $addFields: {
-          totalAttendees: { $size: '$attendees' },
-        },
-      },
-    ]);
-
-    return result[0];
+async findByIdWithAttendees(webinarId: string) {
+  if (!Types.ObjectId.isValid(webinarId)) {
+    return null;
   }
+
+  const result = await this.webinarModel.aggregate([
+    {
+      $match: { _id: new Types.ObjectId(webinarId) },
+    },
+    {
+      $lookup: {
+        from: 'attendees',
+        localField: '_id',
+        foreignField: 'webinarId',
+        as: 'attendees',
+      },
+    },
+    {
+      $addFields: {
+        attendeeCount: { $size: '$attendees' }, // ✅ consistent name
+      },
+    },
+  ]);
+
+  if (!result.length) {
+    return null; // ✅ controller will handle 404
+  }
+
+  return result[0];
+}
 }

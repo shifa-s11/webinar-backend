@@ -44,10 +44,6 @@ export class AttendeesService {
       throw error;
     }
 
-    await this.webinarModel.updateOne(
-      { _id: webinar._id },
-      { $inc: { attendeeCount: 1 } },
-    );
     const updatedWebinar = await this.webinarModel.findByIdAndUpdate(
       webinar._id,
       { $inc: { attendeeCount: 1 } },

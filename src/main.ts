@@ -10,7 +10,11 @@ async function bootstrap() {
   const frontendUri = configService.get<string>('FRONTEND_URI');
 
   app.enableCors({
-    origin: ['http://localhost:5173', frontendUri],
+    origin: [
+      'http://localhost:5173',
+      'https://webinar-client-blush.vercel.app/',
+      frontendUri,
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   });

@@ -48,8 +48,15 @@ export class AttendeesService {
       { _id: webinar._id },
       { $inc: { attendeeCount: 1 } },
     );
-
-    return { message: 'Registration successful' };
+    const updatedWebinar = await this.webinarModel.findByIdAndUpdate(
+      webinar._id,
+      { $inc: { attendeeCount: 1 } },
+      { new: true },
+    );
+    return {
+      message: 'Registration successful',
+      attendeeCount: updatedWebinar.attendeeCount,
+    };
   }
   async findByWebinar(webinarId: string) {
     if (!Types.ObjectId.isValid(webinarId)) {
